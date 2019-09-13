@@ -1,13 +1,15 @@
 import java.util.ArrayList;
 
 public class Node {
-	private int Num;
-	private int Group;
-	private int XCoord;
-	private int YCoord;
-	private int Demand;
+	private int 	Num;
+	private int		Group;
+	private int 	XCoord;
+	private int 	YCoord;
+	private int 	Demand;
+	private boolean Visited = false;
 	
 	private static ArrayList<Node> Nodes = new ArrayList<Node>();
+	
 	
 	public Node() {}
 	
@@ -66,5 +68,13 @@ public class Node {
 	public static int getDistance(Node a, Node b) {
 		return (int) Math.round(Math.sqrt( (Math.pow(a.getXCoord() - b.getXCoord(), 2) + 
 				(Math.pow(a.getYCoord() - b.getYCoord(), 2)))));
+	}
+
+	public boolean isVisited() {
+		return Visited;
+	}
+
+	public void setVisited(boolean b) {
+		Visited = b;
 	}
 }
