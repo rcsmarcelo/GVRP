@@ -20,7 +20,7 @@ public class Instance {
 		readInstance();
 		preProcess();
 		LocalSearch ls = new LocalSearch(VehicleCapacity);
-		ls.startSearch();
+		System.out.println(ls.startSearch());
 	}
 	
 	private static void preProcess() {
@@ -37,7 +37,7 @@ public class Instance {
 	}
 	
 	private static void readInstance() throws IOException {
-		File file = new File("C:\\Users\\tchel\\Documents\\GVRP3\\A-n48-k7-C16-V3.gvrp"); 
+		File file = new File("C:\\Users\\tchel\\Documents\\GVRP3\\A-n60-k9-C20-V3.gvrp"); 
 		BufferedReader br = new BufferedReader(new FileReader(file)); 
 		String st, split[];
 		  

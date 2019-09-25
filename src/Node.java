@@ -7,6 +7,7 @@ public class Node {
 	private int 	YCoord;
 	private int 	Demand;
 	private boolean Visited = false;
+	private int 	AccLength;
 	
 	private static ArrayList<Node> Nodes = new ArrayList<Node>();
 	
@@ -51,6 +52,14 @@ public class Node {
 	
 	public void setDemand(int demand) {
 		Demand = demand;
+	}
+	
+	public void setAccLength(int acclength) {
+		AccLength = acclength;
+	}
+	
+	public int getAccLength() {
+		return AccLength;
 	}
 	
 	public static ArrayList<Node> getNodes() {
