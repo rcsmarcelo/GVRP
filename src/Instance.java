@@ -2,7 +2,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Collections;
 
 public class Instance {
 	private static String  InstanceName;
@@ -11,9 +12,9 @@ public class Instance {
 	private static int	   VehicleCapacity;
 	private static int	   NumOfGroups;
 	
-	private static ArrayList<ArrayList<Node>> 	 Groups;
-	private static ArrayList<ArrayList<Node>> 	 Routes;
-	private static ArrayList<ArrayList<Integer>> Distances;
+	private static LinkedList<LinkedList<Node>> 	 Groups;
+	private static LinkedList<LinkedList<Node>> 	 Routes;
+	private static LinkedList<LinkedList<Integer>> Distances;
 	
 	
 	public static void main(String[] args)throws Exception {
@@ -24,9 +25,9 @@ public class Instance {
 	}
 	
 	private static void preProcess() {
-		Distances = new ArrayList<ArrayList<Integer>>(InstanceDimension);
+		Distances = new LinkedList<LinkedList<Integer>>();
 		for (int line = 0; line < InstanceDimension; line++) {
-			Distances.add(new ArrayList<Integer>(InstanceDimension));
+			Distances.add(new LinkedList<Integer>());
 			for (int col = 0; col < InstanceDimension; col++) {
 				if (line == col)
 					Distances.get(line).add(0);
@@ -37,7 +38,7 @@ public class Instance {
 	}
 	
 	private static void readInstance() throws IOException {
-		File file = new File("C:\\Users\\tchel\\Documents\\GVRP3\\A-n60-k9-C20-V3.gvrp"); 
+		File file = new File("C:\\Users\\tchel\\Documents\\GVRP3\\A-n61-k9-C21-V4.gvrp"); 
 		BufferedReader br = new BufferedReader(new FileReader(file)); 
 		String st, split[];
 		  
@@ -68,14 +69,16 @@ public class Instance {
 		  
 		//group section
 		br.readLine();
-		Groups = new ArrayList<ArrayList<Node>>(NumOfGroups);
+		Groups = new LinkedList<LinkedList<Node>>();
 		for (int i = 0; i < NumOfGroups; i++) {
 		  st = br.readLine();
 		  split = st.split(" ");
-		  Groups.add(new ArrayList<Node>());
+		  Groups.add(new LinkedList<Node>());
 		  for (int j = 1; j < split.length - 1; j++)
 			  Groups.get(i).add(Node.getNode(Integer.parseInt(split[j]) - 1));
 		}
+		
+		Collections.shuffle(Groups);
 		  
 		//demand section
 		br.readLine();
@@ -93,7 +96,7 @@ public class Instance {
 		return Distances.get(a.getNum() - 1).get(b.getNum() - 1);
 	}
 	
-	public static ArrayList<ArrayList<Node>> getGroups() {
+	public static LinkedList<LinkedList<Node>> getGroups() {
 		return Groups;
 	}
 	

@@ -1,24 +1,25 @@
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class LocalSearch {
 	private int	VehicleCapacity;
 	
-	private static ArrayList<ArrayList<Node>> GlobalSolution;
+	private static LinkedList<LinkedList<Node>> GlobalSolution;
 	
 	
 	public LocalSearch (int Capacity) {
 		VehicleCapacity = Capacity;
 	}
 	
-	public ArrayList<ArrayList<Node>> startSearch() {
+	public LinkedList<LinkedList<Node>> startSearch() {
 		GlobalSolution = localSearch();
 		
 		return GlobalSolution;
 	}
 	
-	private int evaluateSolution(ArrayList<ArrayList<Node>> Solution) {
+	private int evaluateSolution(LinkedList<LinkedList<Node>> Solution) {
 		int Distance = 0;
 		
 		for (int c = 0; c < Solution.size(); c++) {
@@ -29,8 +30,8 @@ public class LocalSearch {
 		return Distance;
 	}
 	
-	private ArrayList<ArrayList<Node>> genStartingSolution() {
-		ArrayList<ArrayList<Node>> Solution = new ArrayList<ArrayList<Node>>();
+	private LinkedList<LinkedList<Node>> genStartingSolution() {
+		LinkedList<LinkedList<Node>> Solution = new LinkedList<LinkedList<Node>>();
 		int AccDemand = 0;
 		int RouteNum = 0;
 		int AccDist = 0;
@@ -42,7 +43,7 @@ public class LocalSearch {
 			int MinDist;
 			
 			if (c == 0) {
-				Solution.add(new ArrayList<Node>());
+				Solution.add(new LinkedList<Node>());
 				Solution.get(RouteNum).add(Depot);
 			}
 			
@@ -61,7 +62,7 @@ public class LocalSearch {
 					Solution.get(RouteNum).add(Depot);
 					AccDist = 0;
 					RouteNum++;
-					Solution.add(new ArrayList<Node>());
+					Solution.add(new LinkedList<Node>());
 					Solution.get(RouteNum).add(Depot);
 					CurrNode = Solution.get(RouteNum).get(AuxSize - c);
 				}
@@ -83,10 +84,12 @@ public class LocalSearch {
 			}
 		}
 		
+		Solution.get(Solution.size() - 1).add(Depot);
+		
 		return Solution;
 	}
 	
-	private boolean checkSolution(ArrayList<ArrayList<Node>> Solution) {
+	private boolean checkSolution(LinkedList<LinkedList<Node>> Solution) {
 		int acc;
 		
 		for (int c = 0; c < Solution.size(); c++) {
@@ -100,7 +103,7 @@ public class LocalSearch {
 		return true;
 	}
 	
-	private ArrayList<ArrayList<Node>> getNeighbor2(ArrayList<ArrayList<Node>> CurrSol) {
+	private LinkedList<LinkedList<Node>> getNeighbor2(LinkedList<LinkedList<Node>> CurrSol) {
 		int Sol1 = 0;
 		int Sol2 = 0;
 		int swapResult1 = 0;
@@ -120,9 +123,9 @@ public class LocalSearch {
 				+ Instance.getDistance(CurrSol.get(1).get(pos2), CurrSol.get(0).get(pos1 - 1)) + Instance.getDistance(
 				CurrSol.get(1).get(pos2), CurrSol.get(0).get(pos1 + 1));
 			swapResult2 = -Instance.getDistance(CurrSol.get(1).get(pos2),
-					CurrSol.get(1).get(pos2 - 1)) - Instance.getDistance(CurrSol.get(1).get(pos2), CurrSol.get(1).get(pos2 + 1))
-					+ Instance.getDistance(CurrSol.get(0).get(pos1), CurrSol.get(1).get(pos2 - 1)) + Instance.getDistance(
-					CurrSol.get(0).get(pos1), CurrSol.get(1).get(pos2 + 1));
+				CurrSol.get(1).get(pos2 - 1)) - Instance.getDistance(CurrSol.get(1).get(pos2), CurrSol.get(1).get(pos2 + 1))
+				+ Instance.getDistance(CurrSol.get(0).get(pos1), CurrSol.get(1).get(pos2 - 1)) + Instance.getDistance(
+				CurrSol.get(0).get(pos1), CurrSol.get(1).get(pos2 + 1));
 		}
 		
 		Sol2 -= (swapResult1 + swapResult2);
@@ -130,46 +133,59 @@ public class LocalSearch {
 		return null;
 	}
 	
-	private ArrayList<ArrayList<Node>> getNeighbor(ArrayList<ArrayList<Node>> CurrSol, int bestSol) {
-		ArrayList<ArrayList<Node>> Memory = new ArrayList<ArrayList<Node>>();
-		ArrayList<ArrayList<ArrayList<Node>>> Neighbors = new ArrayList<ArrayList<ArrayList<Node>>>();
+	private LinkedList<LinkedList<Node>> getNeighbor(LinkedList<LinkedList<Node>> CurrSol, int bestSol) {
+		LinkedList<LinkedList<Node>> Memory = new LinkedList<LinkedList<Node>>();
 
 		for (int c = 0; c < CurrSol.size(); c++) {
-			Memory.add(new ArrayList<Node>());
+			Memory.add(new LinkedList<Node>());
 			for (int d = 0; d < CurrSol.get(c).size(); d++)
 				Memory.get(c).add(CurrSol.get(c).get(d));
 		}
 		
-		for (int d = 0; d < 100; d++) {
-			for (int c = 0; c < CurrSol.size(); c++) {
-				int pos1 = ThreadLocalRandom.current().nextInt(1, CurrSol.get(c).size() - 1);
-				int pos2 = ThreadLocalRandom.current().nextInt(1, CurrSol.get(c).size() - 1);
-				Collections.swap(CurrSol.get(c), pos2, pos1);
-				
-				if (CurrSol.size() > c + 1)
-					do {
-						pos1 = ThreadLocalRandom.current().nextInt(1, CurrSol.get(c).size() - 1);
-						pos2 = ThreadLocalRandom.current().nextInt(1, CurrSol.get(c + 1).size() - 1);
-						Node Aux = CurrSol.get(c).get(pos1);
-						CurrSol.get(c).set(pos1, CurrSol.get(c + 1).get(pos2));
-						CurrSol.get(c + 1).set(pos2, Aux);
-					} while (!checkSolution(CurrSol));
+		for (int d = 0; d < 30; d++) {
+			int c = ThreadLocalRandom.current().nextInt(0, CurrSol.size());
+			int pos1 = ThreadLocalRandom.current().nextInt(1, CurrSol.get(c).size() - 1);
+			int pos2 = ThreadLocalRandom.current().nextInt(1, CurrSol.get(c).size() - 1);
+			Collections.swap(CurrSol.get(c), pos2, pos1);
+			
+			if (CurrSol.size() < c + 1) {
+				pos1 = ThreadLocalRandom.current().nextInt(1, CurrSol.get(c).size() - 1);
+				pos2 = ThreadLocalRandom.current().nextInt(1, CurrSol.get(c + 1).size() - 1);
+				Node AuxNode = CurrSol.get(c).get(pos1);
+				CurrSol.get(c).set(pos1, CurrSol.get(c + 1).get(pos2));
+				CurrSol.get(c + 1).set(pos2, AuxNode);
+			} else if (CurrSol.size() < c - 1) {
+				pos1 = ThreadLocalRandom.current().nextInt(1, CurrSol.get(c).size() - 1);
+				pos2 = ThreadLocalRandom.current().nextInt(1, CurrSol.get(c - 1).size() - 1);
+				Node AuxNode = CurrSol.get(c).get(pos1);
+				CurrSol.get(c).set(pos1, CurrSol.get(c - 1).get(pos2));
+				CurrSol.get(c - 1).set(pos2, AuxNode);
 			}
-			Neighbors.add(CurrSol);
+			
+			/*for (int A = 0; A < CurrSol.size(); A++) {
+				for (int B = 0; B < CurrSol.get(A).size(); B++)
+					System.out.printf("%d ", CurrSol.get(A).get(B).getNum());
+				System.out.println();
+				
+			}*/
+			if (evaluateSolution(CurrSol) <= bestSol)
+				return CurrSol;
+			
+			for (int e = 0; e < Memory.size(); e++) {
+				for (int f = 0; f < Memory.get(e).size(); f++) {
+					CurrSol.get(e).add(Memory.get(e).get(f));
+				}
+			}
 		}
-		
-		for (int c = 0; c < Neighbors.size(); c++)
-			if(evaluateSolution(Neighbors.get(c)) <= bestSol)
-				return Neighbors.get(c);
 		
 		return Memory;
 	}
 	
-	private ArrayList<ArrayList<Node>> localSearch() {
-		ArrayList<ArrayList<Node>> Solution = genStartingSolution();
+	private LinkedList<LinkedList<Node>> localSearch() {
+		LinkedList<LinkedList<Node>> Solution = genStartingSolution();
 		int best = evaluateSolution(Solution);
 		System.out.println(evaluateSolution(Solution));
-		for (int c = 0, aux = 0; c < 1000000; c++) {
+		for (int c = 0, aux = 0; c < 100000; c++) {
 			int Sol = evaluateSolution(Solution);
 			Solution = getNeighbor(Solution, Sol);
 			System.out.println(Sol);
@@ -177,7 +193,7 @@ public class LocalSearch {
 				best = Sol;
 			if (Sol == evaluateSolution(Solution))
 				aux++;
-			if (aux >= 500) {
+			if (aux >= 1000) {
 				aux = 0;
 				Solution = perturbSolution(Solution);
 			}
@@ -186,13 +202,39 @@ public class LocalSearch {
 		return Solution;
 	}
 
-	private ArrayList<ArrayList<Node>> perturbSolution(ArrayList<ArrayList<Node>> solution) {
-		for (int c = 0; c < solution.size(); c++)
-			for(int d = 0; d < solution.get(c).size(); d++) {
-				Collections.shuffle(solution.get(c));
-				if(!checkSolution(solution))
-					System.exit(0);
+	private LinkedList<LinkedList<Node>> perturbSolution(LinkedList<LinkedList<Node>> solution) {
+		LinkedList<LinkedList<Node>> Memory = new LinkedList<LinkedList<Node>>();
+
+		for (int c = 0; c < solution.size(); c++) {
+			Memory.add(new LinkedList<Node>());
+			for (int d = 0; d < solution.get(c).size(); d++)
+				Memory.get(c).add(solution.get(c).get(d));
+		}
+		
+		for (int c = 0; c < 50; c++) {
+			int pos1 = ThreadLocalRandom.current().nextInt(0, solution.size() - 1);
+			int pos2 = ThreadLocalRandom.current().nextInt(0, solution.size() - 1);
+			int aux = 0;
+			
+			if (pos1 == pos2)
+				continue;
+			if (solution.get(pos1).size() > solution.get(pos2).size()) 
+				aux = solution.get(pos2).size();
+			else
+				aux = solution.get(pos1).size();
+			
+			for (int d = 1; d < aux/2; d++) {
+				Node AuxNode = solution.get(pos1).get(d);
+				solution.get(pos1).set(d, solution.get(pos2).get(d));
+				solution.get(pos2).set(d, AuxNode);
 			}
-		return solution;
+			
+			Collections.shuffle(solution.get(pos1).subList(1, solution.get(pos1).size() - 1));
+			Collections.shuffle(solution.get(pos2).subList(1, solution.get(pos2).size() - 1));
+			
+			if (checkSolution(solution))
+				return solution;
+		}
+		return Memory;
 	}
 }
