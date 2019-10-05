@@ -7,7 +7,9 @@ public class Node {
 	private int 	YCoord;
 	private int 	Demand;
 	private boolean Visited = false;
+	private boolean Included = false;
 	private int 	AccLength;
+	private int		AccDemand;
 	
 	private static ArrayList<Node> Nodes = new ArrayList<Node>();
 	
@@ -75,7 +77,7 @@ public class Node {
 	}
 	
 	public static int getDistance(Node a, Node b) {
-		return (int) Math.round(Math.sqrt( (Math.pow(a.getXCoord() - b.getXCoord(), 2) + 
+		return (int) Math.round(Math.sqrt((Math.pow(a.getXCoord() - b.getXCoord(), 2) + 
 				(Math.pow(a.getYCoord() - b.getYCoord(), 2)))));
 	}
 
@@ -86,4 +88,16 @@ public class Node {
 	public void setVisited(boolean b) {
 		Visited = b;
 	}
+
+	public int getAccDemand() {
+		return AccDemand;
+	}
+	
+	public void setAccDemand(int demand) {
+		AccDemand = demand;
+	}
+
+	public void setIncluded(boolean included) { Included = included; }
+
+	public boolean isIncluded() { return Included; }
 }

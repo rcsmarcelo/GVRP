@@ -38,7 +38,7 @@ public class Instance {
 	}
 	
 	private static void readInstance() throws IOException {
-		File file = new File("C:\\Users\\tchel\\Documents\\GVRP3\\A-n61-k9-C21-V4.gvrp"); 
+		File file = new File("C:\\Users\\ramos\\Downloads\\GVRP3\\GVRP3\\A-n37-k6-C13-V2.gvrp");
 		BufferedReader br = new BufferedReader(new FileReader(file)); 
 		String st, split[];
 		  
@@ -77,8 +77,6 @@ public class Instance {
 		  for (int j = 1; j < split.length - 1; j++)
 			  Groups.get(i).add(Node.getNode(Integer.parseInt(split[j]) - 1));
 		}
-		
-		Collections.shuffle(Groups);
 		  
 		//demand section
 		br.readLine();
@@ -99,5 +97,7 @@ public class Instance {
 	public static LinkedList<LinkedList<Node>> getGroups() {
 		return Groups;
 	}
+
+	public static LinkedList<Node> getGroup(int gnum) { return Groups.get(gnum); }
 	
 }
