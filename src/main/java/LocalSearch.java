@@ -6,18 +6,15 @@ import java.util.Date;
 public class LocalSearch {
 	private int	 VehicleCapacity;
 	private long Time;
-	
-	private static LinkedList<LinkedList<Node>> GlobalSolution;
-	
-	
+
 	public LocalSearch (int Capacity) {
 		VehicleCapacity = Capacity;
 	}
 	
-	public LinkedList<LinkedList<Node>> startSearch() {
-		GlobalSolution = localSearch();
+	public int startSearch() {
+		int Solution = localSearch();
 		
-		return GlobalSolution;
+		return Solution;
 	}
 	
 	private void printSolution(LinkedList<LinkedList<Node>> Solution) {
@@ -157,32 +154,21 @@ public class LocalSearch {
 		int Sol1 = 0;
 		int Sol2 = 0;
 		int Demand = 0;
-		int relResult1 = 0;
-		int relResult2 = 0;
-		int auxResult1 = 0;
-		int auxResult2 = 0;
-		int auxResult3 = 0;
-		int auxResult4 = 0;
-		
-		Sol1 = evaluateSolution(CurrSol);
+
+		for (int c = 0; c < CurrSol.size(); c++)
+			Sol1 += CurrSol.get(c).get(CurrSol.get(c).size() - 1).getAccLength();
 		Sol2 = Sol1;
 		
-		auxResult1 = Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r1).get(pos1 - 1));
+		Sol2 -= Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r1).get(pos1 - 1));
 		
 		if (CurrSol.get(r1).size() > pos1 + 1) {
-			auxResult2 = Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r1).get(pos1 + 1));
-			auxResult3 = Instance.getDistance(CurrSol.get(r1).get(pos1 - 1), CurrSol.get(r1).get(pos1 + 1));
+			Sol2 -= Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r1).get(pos1 + 1));
+			Sol2 += Instance.getDistance(CurrSol.get(r1).get(pos1 - 1), CurrSol.get(r1).get(pos1 + 1));
 		}
-		
-		relResult1 = -auxResult1 - auxResult2 + auxResult3;
-		
-		auxResult4 = Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r2).get(pos2));
-		auxResult1 = Instance.getDistance(CurrSol.get(r2).get(pos2), CurrSol.get(r2).get(pos2 - 1));
-		auxResult3 = Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r2).get(pos2 - 1));
-		
-		relResult2 = -auxResult1 + auxResult3 + auxResult4;
-		
-		Sol2 += relResult1 + relResult2;
+
+		Sol2 += Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r2).get(pos2));
+		Sol2 -= Instance.getDistance(CurrSol.get(r2).get(pos2), CurrSol.get(r2).get(pos2 - 1));
+		Sol2 += Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r2).get(pos2 - 1));
 		
 		if (r1 != r2) {
 			Demand = CurrSol.get(r2).get(CurrSol.get(r2).size() - 1).getAccDemand() +
@@ -201,46 +187,34 @@ public class LocalSearch {
 		int Sol2 = 0;
 		int Demand = 0;
 		int Demand2 = 0;
-		int swapResult1 = 0;
-		int swapResult2 = 0;
-		int auxResult1 = 0;
-		int auxResult2 = 0;
-		int auxResult3 = 0;
-		int auxResult4 = 0;
 		
-		Sol1 = evaluateSolution(CurrSol);
+		for (int c = 0; c < CurrSol.size(); c++)
+			Sol1 += CurrSol.get(c).get(CurrSol.get(c).size() - 1).getAccLength();
 		Sol2 = Sol1;
 		
-		auxResult1 = Instance.getDistance(CurrSol.get(r1).get(pos1),
+		Sol2 -= Instance.getDistance(CurrSol.get(r1).get(pos1),
 			CurrSol.get(r1).get(pos1 - 1));
-		auxResult3 = Instance.getDistance(CurrSol.get(r2).get(pos2), 
+		Sol2 += Instance.getDistance(CurrSol.get(r2).get(pos2),
 			CurrSol.get(r1).get(pos1 - 1));
 			
 		if (CurrSol.get(r1).size() > pos1 + 1) {
-			auxResult2 = Instance.getDistance(CurrSol.get(r1).get(pos1), 
-				CurrSol.get(r1).get(pos1 + 1));
-			auxResult4 = Instance.getDistance(CurrSol.get(r2).get(pos2), 
-				CurrSol.get(r1).get(pos1 + 1));
+			Sol2 -= Instance.getDistance(CurrSol.get(r1).get(pos1),
+					CurrSol.get(r1).get(pos1 + 1));
+			Sol2 += Instance.getDistance(CurrSol.get(r2).get(pos2),
+					CurrSol.get(r1).get(pos1 + 1));
 		}
-		swapResult1 = -auxResult1 - auxResult2 + auxResult3 + auxResult4;
-		auxResult1 = 0;
-		auxResult2 = 0;
-		auxResult3 = 0;
-		auxResult4 = 0;
-		
-		auxResult1 = Instance.getDistance(CurrSol.get(r2).get(pos2),
+
+		Sol2 -= Instance.getDistance(CurrSol.get(r2).get(pos2),
 				CurrSol.get(r2).get(pos2 - 1));
-		auxResult3 = Instance.getDistance(CurrSol.get(r1).get(pos1), 
+		Sol2 += Instance.getDistance(CurrSol.get(r1).get(pos1),
 				CurrSol.get(r2).get(pos2 - 1));
 					
 		if (CurrSol.get(r2).size() > pos2 + 1) {
-			auxResult2 = Instance.getDistance(CurrSol.get(r2).get(pos2), 
+			Sol2 -= Instance.getDistance(CurrSol.get(r2).get(pos2),
 					CurrSol.get(r2).get(pos2 + 1));
-			auxResult4 = Instance.getDistance(CurrSol.get(r1).get(pos1), 
+			Sol2 += Instance.getDistance(CurrSol.get(r1).get(pos1),
 					CurrSol.get(r2).get(pos2 + 1));
-			swapResult2 = -auxResult1 - auxResult2 + auxResult3 + auxResult4;
 		}
-		Sol2 += swapResult1 + swapResult2;
 		
 		if (r1 != r2) {
 			Demand = CurrSol.get(r1).get(CurrSol.get(r1).size() - 1).getAccDemand()
@@ -257,16 +231,6 @@ public class LocalSearch {
 	}
 	
 	private LinkedList<LinkedList<Node>> getNeighbor(LinkedList<LinkedList<Node>> CurrSol, int bestSol) {
-		
-		/* Intra-route Swap */
-		for (int c = 0; c < CurrSol.size(); c++)
-			for (int d = 1; d < CurrSol.get(c).size() - 1; d++)
-				for (int e = 1; e < CurrSol.get(c).size() - 1; e++)
-					if(d != e && checkSwap(CurrSol, d, e, c, c)) {
-						Collections.swap(CurrSol.get(c), e, d);
-						return CurrSol;
-					}
-
 		/* Inter-route Swap */
 		for (int c = 0; c < CurrSol.size(); c++) {
 			int pos = ThreadLocalRandom.current().nextInt(0, CurrSol.size());
@@ -281,10 +245,10 @@ public class LocalSearch {
 					}
 		}
 		
-		/*Inter Route Relocate*/
+		/*Relocate*/
+		for(int c = 0; c < CurrSol.size(); c++) {
 		int pos1 = ThreadLocalRandom.current().nextInt(0, CurrSol.size());
 		int pos2 = ThreadLocalRandom.current().nextInt(0, CurrSol.size());
-		if (pos1 != pos2) {
 			for (int d = 1; d < CurrSol.get(pos1).size() - 1; d++)
 				for (int e = 1; e < CurrSol.get(pos2).size() - 1; e++) {
 					if (d != e && checkRelocate(CurrSol, d, e, pos1, pos2)) {
@@ -295,39 +259,35 @@ public class LocalSearch {
 						}
 					}
 				}
-		}
+			}
 
 		return CurrSol;
 	}
 	
-	private LinkedList<LinkedList<Node>> localSearch() {
+	private int localSearch() {
 		LinkedList<LinkedList<Node>> Solution = genStartingSolution();
 		int best = evaluateSolution(Solution);
 		int aux = 0;
 		int Sol = best;
 		Time = new Date().getTime();
+		System.out.println("Running...");
 		while (true) {
-			//printSolution(Solution);
 			Solution = getNeighbor(Solution, Sol);
 			Sol = evaluateSolution(Solution);
 			//printSolution(Solution);
-			System.out.printf("%d - %d\n", best, Sol);
 			if (Sol < best)
 				best = Sol;
 			else
 				aux++;
-			if (aux >= 100) {
+			if (aux == 500) {
 				aux = 0;
 				Collections.shuffle(Instance.getGroups());
 				Solution = genStartingSolution();
-				//Solution = perturbSolution(Solution);
-				//evaluateSolution(Solution);
 			}
 			if (new Date().getTime() - Time >= 120000)
 				break;
 		}
-		System.out.println(best);
-		return Solution;
+		return best;
 	}
 
 	private LinkedList<LinkedList<Node>> perturbSolution(LinkedList<LinkedList<Node>> solution) {
@@ -347,7 +307,7 @@ public class LocalSearch {
 			int pos2 = ThreadLocalRandom.current().nextInt(0, solution.size() - 1);
 			int aux = 0;
 			
-			/*if (solution.get(pos1).size() > solution.get(pos2).size())
+			if (solution.get(pos1).size() > solution.get(pos2).size())
 				aux = solution.get(pos2).size();
 			else
 				aux = solution.get(pos1).size();
@@ -356,14 +316,12 @@ public class LocalSearch {
 				Node AuxNode = solution.get(pos1).get(d);
 				solution.get(pos1).set(d, solution.get(pos2).get(d));
 				solution.get(pos2).set(d, AuxNode);
-			}*/
+			}
 
 			Collections.shuffle(solution.get(c).subList(1, solution.get(c).size() - 1));
 
-			if (checkSolution(solution)) {
-				System.out.println("SOFUCKINGSAD");
+			if (checkSolution(solution))
 				return solution;
-			}
 			}
 		}
 		return Memory;

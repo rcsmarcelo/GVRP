@@ -11,6 +11,7 @@ public class Instance {
 	private static int	   NumOfVehicles;
 	private static int	   VehicleCapacity;
 	private static int	   NumOfGroups;
+	private static String  Filename;
 	
 	private static LinkedList<LinkedList<Node>> 	 Groups;
 	private static LinkedList<LinkedList<Node>> 	 Routes;
@@ -18,6 +19,7 @@ public class Instance {
 	
 	
 	public static void main(String[] args)throws Exception {
+	    //Filename = args[0];
 		readInstance();
 		preProcess();
 		LocalSearch ls = new LocalSearch(VehicleCapacity);
@@ -38,7 +40,7 @@ public class Instance {
 	}
 	
 	private static void readInstance() throws IOException {
-		File file = new File("C:\\Users\\ramos\\Downloads\\GVRP3\\GVRP3\\A-n37-k6-C13-V2.gvrp");
+		File file = new File("C:\\Users\\ramos\\Downloads\\GVRP3\\GVRP3\\A-n33-k6-C11-V2.gvrp");
 		BufferedReader br = new BufferedReader(new FileReader(file)); 
 		String st, split[];
 		  
