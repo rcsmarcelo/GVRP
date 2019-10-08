@@ -13,7 +13,7 @@ public class LocalSearch {
 	
 	public int startSearch() {
 		int Solution = localSearch();
-		
+
 		return Solution;
 	}
 	
@@ -24,39 +24,39 @@ public class LocalSearch {
 			System.out.println();
 		}
 	}
-	
-	private int evaluateSolution(LinkedList<LinkedList<Node>> Solution) {
-		int Distance = 0;
-		
-		for (int c = 0; c < Solution.size(); c++) {
-			int AccDemand = 0;
-			int AccDist = 0;
-			for (int d = 1; d < Solution.get(c).size(); d++) {
-				int auxDist = Instance.getDistance(Solution.get(c).get(d - 1), Solution.get(c).get(d));
-				if (Solution.get(c).get(d).getNum() != 1) {
-					LinkedList<Node> Grps = Instance.getGroup(Solution.get(c).get(d).getGroup());
-					Node Best = Solution.get(c).get(d);
-					for (int e = 0; e < Grps.size(); e++)
-						if (!Solution.get(c).get(d).isIncluded()
-							 &&	Grps.get(e).getNum() != Solution.get(c).get(d).getNum()
-							 &&	Instance.getDistance(Grps.get(e), Solution.get(c).get(d - 1)) < auxDist) {
-							Best = Grps.get(e);
-						}
-					Solution.get(c).get(d).setIncluded(false);
-					Solution.get(c).set(d, Best);
-					Solution.get(c).get(d).setIncluded(true);
-				}
 
-				AccDemand += Solution.get(c).get(d).getDemand();
-				Solution.get(c).get(d).setAccDemand(AccDemand);
-				AccDist += Instance.getDistance(Solution.get(c).get(d - 1), Solution.get(c).get(d));
-				Distance += Instance.getDistance(Solution.get(c).get(d - 1), Solution.get(c).get(d));
-				Solution.get(c).get(d).setAccLength(AccDist);
-			}
-		}
-		
-		return Distance;
-	}
+    private int evaluateSolution(LinkedList<LinkedList<Node>> Solution) {
+        int Distance = 0;
+
+        for (int c = 0; c < Solution.size(); c++) {
+            int AccDemand = 0;
+            int AccDist = 0;
+            for (int d = 1; d < Solution.get(c).size(); d++) {
+                int auxDist = Instance.getDistance(Solution.get(c).get(d - 1), Solution.get(c).get(d));
+                if (Solution.get(c).get(d).getNum() != 1) {
+                    LinkedList<Node> Grps = Instance.getGroup(Solution.get(c).get(d).getGroup());
+                    Node Best = Solution.get(c).get(d);
+                    for (int e = 0; e < Grps.size(); e++)
+                        if (!Solution.get(c).get(d).isIncluded()
+                                &&	Grps.get(e).getNum() != Solution.get(c).get(d).getNum()
+                                &&	Instance.getDistance(Grps.get(e), Solution.get(c).get(d - 1)) < auxDist) {
+                            Best = Grps.get(e);
+                        }
+                    Solution.get(c).get(d).setIncluded(false);
+                    Solution.get(c).set(d, Best);
+                    Solution.get(c).get(d).setIncluded(true);
+                }
+
+                AccDemand += Solution.get(c).get(d).getDemand();
+                Solution.get(c).get(d).setAccDemand(AccDemand);
+                AccDist += Instance.getDistance(Solution.get(c).get(d - 1), Solution.get(c).get(d));
+                Distance += Instance.getDistance(Solution.get(c).get(d - 1), Solution.get(c).get(d));
+                Solution.get(c).get(d).setAccLength(AccDist);
+            }
+        }
+
+        return Distance;
+    }
 	
 	private LinkedList<LinkedList<Node>> genStartingSolution() {
 		LinkedList<LinkedList<Node>> Solution = new LinkedList<LinkedList<Node>>();
@@ -66,6 +66,7 @@ public class LocalSearch {
 		int AuxSize = 0;
 		Node Depot = Node.getNode(0);
 		Depot.setGroup(-1);
+		Depot.setDemand(0);
 		
 		for (int c = 0; c < Instance.getGroups().size(); c++) {
 			Node CurrNode, MinDistNode;
@@ -88,13 +89,14 @@ public class LocalSearch {
 				if (Instance.getGroups().get(c).get(d).getDemand() + AccDemand > VehicleCapacity) {
 					Depot.setAccDemand(AccDemand);
 					Depot.setAccLength(AccDist);
+                    Solution.get(RouteNum).add(Depot);
 					Depot = new Node();
 					Depot.setXCoord(Solution.get(0).get(0).getXCoord());
 					Depot.setYCoord(Solution.get(0).get(0).getYCoord());
 					Depot.setNum(Solution.get(0).get(0).getNum());
 					Depot.setGroup(-1);
+					Depot.setDemand(0);
 
-					Solution.get(RouteNum).add(Depot);
 					AccDemand = 0;
 					AccDist = 0;
 					RouteNum++;
@@ -113,9 +115,9 @@ public class LocalSearch {
 			
 			if (MinDistNode != null) {
 				MinDistNode.setGroup(c);
-				AccDemand += MinDistNode.getDemand();
+                AccDemand += MinDistNode.getDemand();
+                MinDistNode.setAccDemand(AccDemand);
 				MinDistNode.setAccLength(AccDist);
-				MinDistNode.setAccDemand(AccDemand);
 				Solution.get(RouteNum).add(MinDistNode);
 				AuxSize++;
 				MinDistNode.setVisited(true);
@@ -127,6 +129,8 @@ public class LocalSearch {
 		Depot.setYCoord(Solution.get(0).get(0).getYCoord());
 		Depot.setNum(Solution.get(0).get(0).getNum());
 		Depot.setGroup(-1);
+		Depot.setAccDemand(AccDemand);
+		Depot.setDemand(0);
 		Solution.get(Solution.size() - 1).add(Depot);
 
 		for (int c = 0; c < Solution.size(); c++)
@@ -137,14 +141,15 @@ public class LocalSearch {
 	}
 	
 	private boolean checkSolution(LinkedList<LinkedList<Node>> Solution) {
-		int acc;
+		int acc = 0;
 		
 		for (int c = 0; c < Solution.size(); c++) {
 			acc = 0;
 			for (int d = 0; d < Solution.get(c).size(); d++) {
 				acc += Solution.get(c).get(d).getDemand();
-				if (acc > VehicleCapacity)
-					return false;
+				if (acc > VehicleCapacity) {
+                    return false;
+                }
 			}
 		}
 		return true;
@@ -160,83 +165,66 @@ public class LocalSearch {
 		Sol2 = Sol1;
 		
 		Sol2 -= Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r1).get(pos1 - 1));
-		
-		if (CurrSol.get(r1).size() > pos1 + 1) {
-			Sol2 -= Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r1).get(pos1 + 1));
-			Sol2 += Instance.getDistance(CurrSol.get(r1).get(pos1 - 1), CurrSol.get(r1).get(pos1 + 1));
-		}
+		Sol2 -= Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r1).get(pos1 + 1));
+		Sol2 += Instance.getDistance(CurrSol.get(r1).get(pos1 - 1), CurrSol.get(r1).get(pos1 + 1));
 
 		Sol2 += Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r2).get(pos2));
 		Sol2 -= Instance.getDistance(CurrSol.get(r2).get(pos2), CurrSol.get(r2).get(pos2 - 1));
 		Sol2 += Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r2).get(pos2 - 1));
 		
 		if (r1 != r2) {
-			Demand = CurrSol.get(r2).get(CurrSol.get(r2).size() - 1).getAccDemand() +
-					CurrSol.get(r1).get(pos1).getDemand();
-			if (Demand > VehicleCapacity)
+			Demand = CurrSol.get(r2).get(CurrSol.get(r2).size() - 1).getAccDemand();
+			Demand += CurrSol.get(r2).get(CurrSol.get(r2).size() - 1).getDemand();
+			Demand += CurrSol.get(r1).get(pos1).getDemand();
+            if (Demand > VehicleCapacity)
 				return false;
-		}
-		
-		if (Sol2 <= Sol1)
-			return true;
-		return false;
-	}
-	
-	private boolean checkSwap(LinkedList<LinkedList<Node>> CurrSol, int pos1, int pos2, int r1, int r2) {
-		int Sol1 = 0;
-		int Sol2 = 0;
-		int Demand = 0;
-		int Demand2 = 0;
-		
-		for (int c = 0; c < CurrSol.size(); c++)
-			Sol1 += CurrSol.get(c).get(CurrSol.get(c).size() - 1).getAccLength();
-		Sol2 = Sol1;
-		
-		Sol2 -= Instance.getDistance(CurrSol.get(r1).get(pos1),
-			CurrSol.get(r1).get(pos1 - 1));
-		Sol2 += Instance.getDistance(CurrSol.get(r2).get(pos2),
-			CurrSol.get(r1).get(pos1 - 1));
-			
-		if (CurrSol.get(r1).size() > pos1 + 1) {
-			Sol2 -= Instance.getDistance(CurrSol.get(r1).get(pos1),
-					CurrSol.get(r1).get(pos1 + 1));
-			Sol2 += Instance.getDistance(CurrSol.get(r2).get(pos2),
-					CurrSol.get(r1).get(pos1 + 1));
 		}
 
-		Sol2 -= Instance.getDistance(CurrSol.get(r2).get(pos2),
-				CurrSol.get(r2).get(pos2 - 1));
-		Sol2 += Instance.getDistance(CurrSol.get(r1).get(pos1),
-				CurrSol.get(r2).get(pos2 - 1));
-					
-		if (CurrSol.get(r2).size() > pos2 + 1) {
-			Sol2 -= Instance.getDistance(CurrSol.get(r2).get(pos2),
-					CurrSol.get(r2).get(pos2 + 1));
-			Sol2 += Instance.getDistance(CurrSol.get(r1).get(pos1),
-					CurrSol.get(r2).get(pos2 + 1));
-		}
-		
-		if (r1 != r2) {
-			Demand = CurrSol.get(r1).get(CurrSol.get(r1).size() - 1).getAccDemand()
-					- CurrSol.get(r1).get(pos1).getDemand() + CurrSol.get(r2).get(pos2).getDemand();
-			Demand2 = CurrSol.get(r2).get(CurrSol.get(r2).size() - 1).getAccDemand()
-					- CurrSol.get(r2).get(pos2).getDemand() + CurrSol.get(r1).get(pos1).getDemand();
-			if (Demand > VehicleCapacity || Demand2 > VehicleCapacity)
-				return false;
-		}
-		
 		if (Sol2 <= Sol1)
 			return true;
 		return false;
 	}
-	
+
+	private boolean checkSwap(LinkedList<LinkedList<Node>> CurrSol, int pos1, int pos2, int r1, int r2){
+	    int Sol1 = 0, Sol2 = 0;
+        int Demand1 = 0, Demand2 = 0;
+
+	    for (int c = 0; c < CurrSol.size(); c++)
+	        Sol1 += CurrSol.get(c).get(CurrSol.get(c).size() - 1).getAccLength();
+	    Sol2 = Sol2;
+
+	    Sol2 -= Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r1).get(pos1 - 1));
+	    Sol2 -= Instance.getDistance(CurrSol.get(r1).get(pos1), CurrSol.get(r1).get(pos1 + 1));
+	    Sol2 += Instance.getDistance(CurrSol.get(r2).get(pos2), CurrSol.get(r1).get(pos1 - 1));
+	    Sol2 += Instance.getDistance(CurrSol.get(r2).get(pos2), CurrSol.get(r1).get(pos1 + 1));
+	    Sol2 -= Instance.getDistance(CurrSol.get(r2).get(pos2), CurrSol.get(r2).get(pos2 - 1));
+	    Sol2 -= Instance.getDistance(CurrSol.get(r2).get(pos2), CurrSol.get(r2).get(pos2 + 1));
+	    Sol2 += Instance.getDistance(CurrSol.get(r2).get(pos2 - 1), CurrSol.get(r1).get(pos1));
+	    Sol2 += Instance.getDistance(CurrSol.get(r2).get(pos2 + 1), CurrSol.get(r1).get(pos1));
+
+	    if (r1 != r2) {
+	        Demand1 = CurrSol.get(r1).get(CurrSol.get(r1).size() - 1).getAccDemand();
+	        Demand1 -= CurrSol.get(r1).get(pos1).getDemand();
+	        Demand1 += CurrSol.get(r2).get(pos2).getDemand();
+	        Demand2 = CurrSol.get(r2).get(CurrSol.get(r2).size() - 1).getAccDemand();
+	        Demand2 -= CurrSol.get(r2).get(pos2).getDemand();
+	        Demand2 += CurrSol.get(r1).get(pos1).getAccDemand();
+
+	        if (Demand1 > VehicleCapacity || Demand2 > VehicleCapacity)
+	            return false;
+        }
+
+	    if (Sol2 < Sol1)
+	        return true;
+	    return false;
+    }
+
 	private LinkedList<LinkedList<Node>> getNeighbor(LinkedList<LinkedList<Node>> CurrSol, int bestSol) {
-		/* Inter-route Swap */
+		/* Swap */
 		for (int c = 0; c < CurrSol.size(); c++) {
 			int pos = ThreadLocalRandom.current().nextInt(0, CurrSol.size());
-			if (c == pos) continue;
 			for (int d = 1; d < CurrSol.get(c).size() - 1 && d < CurrSol.get(pos).size(); d++)
-				for (int e = 1; e < CurrSol.get(pos).size() - 1 && e < CurrSol.get(pos).size(); e++)
+				for (int e = 1; e < CurrSol.get(pos).size() - 1 && e < CurrSol.get(c).size(); e++)
 					if(d != e && checkSwap(CurrSol, d, e, c, pos)) {
 						Node Aux = CurrSol.get(c).get(d);
 						CurrSol.get(c).set(d, CurrSol.get(pos).get(e));
@@ -245,7 +233,7 @@ public class LocalSearch {
 					}
 		}
 		
-		/*Relocate*/
+		/* Relocate */
 		for(int c = 0; c < CurrSol.size(); c++) {
 		int pos1 = ThreadLocalRandom.current().nextInt(0, CurrSol.size());
 		int pos2 = ThreadLocalRandom.current().nextInt(0, CurrSol.size());
@@ -255,7 +243,7 @@ public class LocalSearch {
 						if (CurrSol.get(pos1).size() > 3) {
 							CurrSol.get(pos2).add(e, CurrSol.get(pos1).get(d));
 							CurrSol.get(pos1).remove(d);
-							return CurrSol;
+                            return CurrSol;
 						}
 					}
 				}
@@ -270,16 +258,17 @@ public class LocalSearch {
 		int aux = 0;
 		int Sol = best;
 		Time = new Date().getTime();
-		System.out.println("Running...");
 		while (true) {
 			Solution = getNeighbor(Solution, Sol);
 			Sol = evaluateSolution(Solution);
-			//printSolution(Solution);
+            System.out.printf("%d - %d\n", best, Sol);
+            if(!checkSolution(Solution))
+                System.exit(1);
 			if (Sol < best)
 				best = Sol;
 			else
 				aux++;
-			if (aux == 500) {
+			if (aux == 300) {
 				aux = 0;
 				Collections.shuffle(Instance.getGroups());
 				Solution = genStartingSolution();
